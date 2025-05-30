@@ -1,0 +1,116 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\profile.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль HR</title>
+    <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content { flex: 1; max-width: 600px; margin: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #eee; padding: 40px; }
+        .profile-title { font-size: 2em; font-weight: bold; margin-bottom: 30px; text-align: center; background: #d6c7f3; border-radius: 8px 8px 0 0; padding: 20px 0;}
+        .profile-card {
+            background: #fff; border-radius: 16px;
+            box-shadow: 0 2px 16px #ccc; padding: 40px 30px;
+        }
+        .profile-info { display: flex; align-items: center; gap: 30px; }
+        .profile-info img { border-radius: 50%; width: 100px; height: 100px; border: 3px solid #d6c7f3; }
+        .profile-details { flex: 1; }
+        .profile-details b { display: inline-block; width: 110px; color: #223355; }
+        .profile-details div { margin-bottom: 10px; }
+        form { margin-top: 30px; }
+        input[type="password"] { width: 100%; padding: 8px; margin: 10px 0; border-radius: 4px; border: 1px solid #ccc; }
+        button { background: #612CCA; color: #fff; padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; }
+        .success { color: #2e8b57; margin-top: 10px; }
+        .error { color: #b22222; margin-top: 10px; }
+        @media (max-width: 600px) {
+            .main-content, .profile-card { padding: 10px 2px; }
+            .profile-info { flex-direction: column; gap: 10px; }
+            .profile-info img { width: 70px; height: 70px; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="sidebar">
+        <div class="profile" onclick="window.location.href='/profile';">
+             <img src="{{ avatar_url or '/static/avatars/kuz.jpg' }}" width="50" height="50" alt="avatar">
+            <div style="margin-top:10px;">{{ current_user.username }}</div>
+            <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+        </div>
+        <nav>
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+            <a href="/employees" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+            <a href="/recruiting" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+            <a href="/tasks" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+            <a href="/company" class="{% if request.path == '/company' %}active{% endif %}">Компания</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="profile-title">Профиль HR</div>
+        <div class="profile-card">
+            <div class="profile-info">
+                <img src="{{ avatar_url or '/static/avatars/kuz.jpg' }}" alt="avatar">
+                <div class="profile-details">
+                    <div><b>ФИО:</b> {{ person[0] }}</div>
+                    <div><b>Должность:</b> {{ person[1] }}</div>
+                    <div><b>Email:</b> {{ person[2] }}</div>
+                    <div><b>Телефон:</b> {{ person[3] }}</div>
+                </div>
+            </div>
+            <hr style="margin:30px 0;">
+            <form method="post">
+                <label><b>Новый пароль:</b></label>
+                <input type="password" name="new_password" required>
+                <button type="submit">Сменить пароль</button>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div style="margin-top:10px;">
+                      {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

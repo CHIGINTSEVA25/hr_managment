@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить сотрудника | HRCloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #F3F3F3; font-family: sans-serif; }
+        .add-form { background: #fff; max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 16px; box-shadow: 0 2px 16px #ccc; }
+        .add-form input, .add-form select, .add-form button { display: block; width: 100%; margin-bottom: 15px; padding: 8px; }
+        .add-form label { margin-bottom: 5px; display: block; }
+        .add-form a { display: inline-block; margin-top: 10px; color: #612CCA; text-decoration: none; }
+        .toast {
+            position: fixed; right: 30px; bottom: 30px; min-width: 220px; max-width: 350px; z-index: 9999;
+            background: #e6ffe6; color: #207520; border: 1px solid #b2e6b2; padding: 16px 24px; border-radius: 10px;
+            font-size: 18px; box-shadow: 0 2px 16px #ccc; opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .toast.show { opacity: 1; pointer-events: auto; }
+        .toast.flash-error { background: #ffe6e6; color: #a10000; border: 1px solid #e6b2b2; }
+    </style>
+</head>
+<body>
+    <form class="add-form" method="post">
+        <h2>Добавить сотрудника</h2>
+        <label>ФИО
+            <input type="text" name="фио" required>
+        </label>
+        <label>Отдел
+    <select name="отдел_id" required>
+        {% for dep in departments %}
+            <option value="{{ dep[0] }}">{{ dep[1] }}</option>
+        {% endfor %}
+    </select>
+        </label>
+        <label>Должность
+            <input type="text" name="должность" required>
+        </label>
+        <label>Дата приёма
+            <input type="date" name="дата_приема" required>
+        </label>
+        <label>Отработанные часы
+            <input type="number" name="отработанные_часы" required>
+        </label>
+        <label>Контактный номер
+            <input type="text" name="контактный_номер" required>
+        </label>
+        <label>Электронная почта
+            <input type="email" name="электронная_почта" required>
+        </label>
+        <label>Статус
+            <input type="text" name="статус" required>
+        </label>
+        <button type="submit">Добавить</button>
+        <a href="{{ url_for('employees') }}">Назад</a>
+    </form>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="toast" class="toast{% if messages[0][0] == 'error' %} flash-error{% endif %}">{{ messages[0][1] }}</div>
+    <script>
+      window.onload = function() {
+        var toast = document.getElementById('toast');
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(function(){ toast.classList.remove('show'); }, 4000);
+        }
+      }
+    </script>
+  {% endif %}
+{% endwith %}
+</body>
+</html>

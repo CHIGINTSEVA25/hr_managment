@@ -1,0 +1,25 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\stats.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рабочая статистика</title>
+</head>
+<body>
+    <h1>Рабочая статистика сотрудников</h1>
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Сотрудник</th>
+            <th>Всего задач</th>
+            <th>Выполнено задач</th>
+        </tr>
+        {% for stat in stats %}
+        <tr>
+            <td>{{ stat[1] }}</td>
+            <td>{{ stat[2] }}</td>
+            <td>{{ stat[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

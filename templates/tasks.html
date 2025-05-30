@@ -1,0 +1,134 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\tasks.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Задачи сотрудника | HRCloud</title>
+    <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .tasks-container { max-width: 800px; margin: 0 auto; }
+        .task-widget {
+            background: #fff; border-radius: 16px; box-shadow: 0 2px 16px #ccc;
+            padding: 24px 32px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .task-info { flex: 1; }
+        .task-title { font-size: 1.2em; font-weight: bold; margin-bottom: 6px; }
+        .task-desc { color: #666; }
+        .task-date { color: #888; font-size: 0.95em; margin-top: 4px; }
+        .check-btn {
+            width: 36px; height: 36px; border-radius: 50%; border: 2px solid #bbb; background: #fff;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border 0.2s, background 0.2s;
+        }
+        .check-btn.done { border: 2px solid #4CAF50; background: #eaffea; }
+        .check-btn svg { width: 20px; height: 20px; }
+        .done .task-title { text-decoration: line-through; color: #aaa; }
+        .add-link { display: inline-block; margin-bottom: 20px; color: #612CCA; text-decoration: none; }
+        /* Стили для просроченных задач */
+        .overdue .task-title,
+        .overdue .task-date {
+            color: #a10000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://placehold.co/50x50" width="50" height="50" alt="avatar">
+            <div style="margin-top:10px;">Александр</div>
+            <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+        </div>
+        <nav>
+           <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+                <a href="/employees" id="employees-link" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+                <a href="/recruiting" id="recruiting-link" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+                <a href="/tasks" id="tasks-link" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+            <a href="#">Компания</a>
+            <a href="#">Настройки</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="tasks-container">
+            <h1>Задачи сотрудника</h1>
+            {% if employee_id %}
+                <a class="add-link" href="{{ url_for('add_task', employee_id=employee_id) }}">+ Добавить задачу</a>
+            {% endif %}
+            <h2>Текущие</h2>
+            {% for task in tasks if not task[4] %}
+            <div class="task-widget{% if task[3] and task[3] < today %} overdue{% endif %}">
+                <div class="task-info">
+                    <div class="task-title">{{ task[1] }}</div>
+                    <div class="task-desc">{{ task[2] }}</div>
+                    <div class="task-date">Выполнить до: {{ task[3] }}</div>
+                    {% if task[3] and task[3] < today %}
+                        <div style="color:red; font-weight:bold;">Просрочено!</div>
+                    {% endif %}
+                </div>
+                <form method="post" style="margin:0;">
+                    <input type="hidden" name="task_id" value="{{ task[0] }}">
+                    <button class="check-btn" title="Выполнить">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#bbb" stroke-width="2"/><path d="M7 13l3 3 7-7" fill="none" stroke="#bbb" stroke-width="2"/></svg>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+            <h2>Выполненные</h2>
+            {% for task in tasks if task[4] %}
+            <div class="task-widget done">
+                <div class="task-info">
+                    <div class="task-title">{{ task[1] }}</div>
+                    <div class="task-desc">{{ task[2] }}</div>
+                    <div class="task-date">Выполнить до: {{ task[3] }}</div>
+                </div>
+                <span class="check-btn done" title="Выполнено">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#4CAF50" stroke="#4CAF50" stroke-width="2"/><path d="M7 13l3 3 7-7" fill="none" stroke="#fff" stroke-width="2"/></svg>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

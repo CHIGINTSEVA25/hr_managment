@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная | HRCloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-widgets {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .top-widget {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #eee;
+            padding: 20px 30px;
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-widget-title {
+            font-size: 15px;
+            color: #888;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .top-widget-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .top-widget-label {
+            font-size: 13px;
+            color: #888;
+        }
+        .widget-title { font-size: 1.2em; margin-bottom: 10px; }
+        .legend {
+            display: flex; align-items: center; gap: 20px; margin-bottom: 10px; justify-content: center;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 15px; cursor:pointer; user-select:none;}
+        .legend-color1 { width: 18px; height: 18px; background: #d1c4e9; border-radius: 4px; }
+        .legend-color2 { width: 18px; height: 18px; background: #612CCA; border-radius: 4px; }
+        .legend-item.active { font-weight: bold; text-decoration: underline; }
+        .stats-block {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .bottom-row {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 30px;
+            width: 100%;
+        }
+        .departments-widget {
+            flex: 2;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .departments-widget h2 { text-align: center; width: 100%; }
+        .departments-widget table { margin-left: auto; margin-right: auto; }
+        .calendar-block {
+            flex: 1;
+            min-width: 220px;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .calendar {
+            background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px #eee; margin-top: 30px;
+        }
+        .calendar-title { font-weight: 500; margin-bottom: 10px; }
+        .calendar-table { width: 100%; text-align: center; font-size: 15px; border-collapse: collapse; }
+        .calendar-table td, .calendar-table th { padding: 4px; }
+        .calendar-table th { color: #aaa; }
+        .calendar-today {
+            background: #612CCA; color: #fff; border-radius: 50%; width: 22px; height: 22px; display: inline-block; line-height: 22px;
+        }
+        .calendar-notify {
+            background: #ff9800;
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: inline-block;
+            line-height: 22px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        @media (max-width: 900px) {
+            .bottom-row { flex-direction: column; align-items: center; }
+            .departments-widget, .calendar-block { max-width: 100%; }
+            .stats-block { width: 100%; }
+            .top-widgets { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <div class="sidebar">
+             <div class="sidebar">
+        <div class="profile" onclick="window.location.href='/profile';">
+            <img src="{{ avatar_url or '/static/avatars/kuz.jpg' }}" width="50" height="50" alt="avatar">
+            <div style="margin-top:10px;">{{ current_user.username }}</div>
+            <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+        </div>
+        <nav>
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+    <a href="/employees" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+    <a href="/recruiting" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+    <a href="/tasks" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+    <a href="/hr_staff_contact" class="{% if request.path == '/hr_staff_contact' %}active{% endif %}">Связь с отделом кадров</a>
+    <a href="{{ url_for('requests_list') }}" class="{% if request.path.startswith('/requests') %}active{% endif %}">Заявки</a>
+    <a href="/company" class="{% if request.path == '/company' %}active{% endif %}">Компания</a>
+        </nav>
+    </div>
+            </nav>
+</nav>
+        </div>
+        <div class="main-content">
+            <!-- Верхние 4 виджета -->
+            <div class="top-widgets">
+                <div class="top-widget">
+                    <div class="top-widget-title">Кол-во сотрудников</div>
+                    <div class="top-widget-value">{{ total_employees }}</div>
+                    <div class="top-widget-label">Сотрудники</div>
+                </div>
+                <div class="top-widget">
+                    <div class="top-widget-title">Кол-во сотрудников в отпуске</div>
+                    <div class="top-widget-value">{{ on_vacation }}</div>
+                    <div class="top-widget-label">Сотрудники</div>
+                </div>
+                <div class="top-widget">
+                    <div class="top-widget-title">Кол-во сотрудников на месте</div>
+                    <div class="top-widget-value">{{ at_work }}</div>
+                    <div class="top-widget-label">Сотрудники</div>
+                </div>
+                <div class="top-widget">
+                    <div class="top-widget-title">Кол-во поставленных задач</div>
+                    <div class="top-widget-value">{{ total_tasks }}</div>
+                    <div class="top-widget-label">Задачи</div>
+                </div>
+            </div>
+            <!-- График на всю ширину -->
+            <div class="stats-block">
+                
+                <div class="widget-title" style="text-align:left;">Рабочая статистика</div>
+                <div class="legend">
+                    <div class="legend-item active" id="show-all">
+                        <span class="legend-color1"></span> Количество задач
+                    </div>
+                    <div class="legend-item" id="show-done">
+                        <span class="legend-color2"></span> Кол-во выполн. задач
+                    </div>
+                </div>
+                <canvas id="tasksChart" width="900" height="250"></canvas>
+            </div>
+            <!-- Нижний ряд: таблица отделов + календарь -->
+            <div class="bottom-row">
+                <div class="departments-widget">
+                    <h2>Список отделов</h2>
+                    <table style="border-collapse:collapse;width:100%;margin-top:10px;">
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Конт. номер руководителя</th>
+                            <th>ФИО руководителя</th>
+                        </tr>
+                        {% for dep in departments %}
+                        <tr>
+                            <td>{{ dep[0] }}</td>
+                            <td>{{ dep[1] }}</td>
+                            <td>{{ dep[2] }}</td>
+                            <td>{{ dep[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="calendar-block">
+                    <div class="calendar">
+                        <div class="calendar-title" id="calendar-title"></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <button id="prev-month" style="border:none;background:#eee;padding:4px 10px;border-radius:6px;cursor:pointer;">&#8592;</button>
+                            <span id="month-year"></span>
+                            <button id="next-month" style="border:none;background:#eee;padding:4px 10px;border-radius:6px;cursor:pointer;">&#8594;</button>
+                        </div>
+                        <table class="calendar-table" id="calendar-table">
+                            <!-- Календарь будет сгенерирован JS -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно для задачи -->
+    <div id="modal" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:1000;align-items:center;justify-content:center;">
+        <div style="background:#fff;padding:24px 32px;border-radius:12px;min-width:300px;max-width:90vw;max-height:80vh;overflow:auto;position:relative;">
+            <button onclick="closeModal()" style="position:absolute;right:12px;top:8px;font-size:20px;background:none;border:none;cursor:pointer;">×</button>
+            <h3 id="modal-date"></h3>
+            <div id="modal-tasks"></div>
+        </div>
+    </div>
+    <script>
+        // График
+        const monthsLabels = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+        const allData = {{ months|tojson }};
+        const doneData = {{ completed|tojson }};
+        const ctx = document.getElementById('tasksChart').getContext('2d');
+        let chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthsLabels,
+                datasets: [
+                    {
+                        label: 'Количество задач',
+                        data: allData,
+                        backgroundColor: '#d1c4e9'
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        document.getElementById('show-all').onclick = function() {
+            chart.data.datasets = [{
+                label: 'Количество задач',
+                data: allData,
+                backgroundColor: '#d1c4e9'
+            }];
+            chart.update();
+            document.getElementById('show-all').classList.add('active');
+            document.getElementById('show-done').classList.remove('active');
+        };
+        document.getElementById('show-done').onclick = function() {
+            chart.data.datasets = [{
+                label: 'Кол-во выполн. задач',
+                data: doneData,
+                backgroundColor: '#612CCA'
+            }];
+            chart.update();
+            document.getElementById('show-done').classList.add('active');
+            document.getElementById('show-all').classList.remove('active');
+        };
+
+        // Календарь
+        const monthNames = [
+            "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+            "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+        ];
+        const weekDays = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+        let today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+
+        // Передайте задачи из Flask в JS
+        const tasksByDate = {{ tasks_by_date|tojson }};
+
+        function renderCalendar(month, year) {
+            document.getElementById('month-year').textContent = `${monthNames[month]} ${year}г`;
+            let firstDay = new Date(year, month, 1);
+            let lastDay = new Date(year, month + 1, 0);
+            let startDay = (firstDay.getDay() + 6) % 7; // ПН=0 ... ВС=6
+
+            let table = `<tr>${weekDays.map(d=>`<th>${d}</th>`).join('')}</tr><tr>`;
+            for (let i = 0; i < startDay; i++) table += "<td></td>";
+
+            for (let date = 1; date <= lastDay.getDate(); date++) {
+                let isToday = date === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                let dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
+                let hasTasks = tasksByDate[dateStr] && tasksByDate[dateStr].length > 0;
+                if (hasTasks) {
+                    table += `<td${isToday ? ' class="calendar-today"' : ''}>
+                        <span class="calendar-notify" onclick="showTasks('${dateStr}')">${date}</span>
+                    </td>`;
+                } else {
+                    table += `<td${isToday ? ' class="calendar-today"' : ''}>${date}</td>`;
+                }
+                if ((startDay + date) % 7 === 0 && date !== lastDay.getDate()) table += "</tr><tr>";
+            }
+            let remaining = (startDay + lastDay.getDate()) % 7;
+            if (remaining !== 0) for (let i = remaining; i < 7; i++) table += "<td></td>";
+            table += "</tr>";
+            document.getElementById('calendar-table').innerHTML = table;
+        }
+
+        function showTasks(dateStr) {
+            const modal = document.getElementById('modal');
+            const modalDate = document.getElementById('modal-date');
+            const modalTasks = document.getElementById('modal-tasks');
+            const tasks = tasksByDate[dateStr];
+            modalDate.textContent = dateStr.split('-').reverse().join('.');
+            if (tasks && tasks.length) {
+                modalTasks.innerHTML = tasks.map(t => `<div style="margin-bottom:10px;"><b>${t.title}</b><br><span style="font-size:13px;color:#888;">${t.description}</span></div>`).join('');
+            } else {
+                modalTasks.innerHTML = '<span style="color:#888;">Нет задач на этот день</span>';
+            }
+            modal.style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        document.getElementById('prev-month').onclick = function() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar(currentMonth, currentYear);
+        };
+        document.getElementById('next-month').onclick = function() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar(currentMonth, currentYear);
+        };
+
+        renderCalendar(currentMonth, currentYear);
+    </script>
+</body>
+</html>

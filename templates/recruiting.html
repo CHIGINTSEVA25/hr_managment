@@ -1,0 +1,140 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\recruiting.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Рекрутинг | HRCloud</title>
+    <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .recruiting-section { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #eee; margin-bottom: 30px; padding: 24px; width: 100%; }
+        .recruiting-section h2 { margin-top: 0; }
+        .vacancy-list, .candidate-list, .resume-list { list-style: none; padding: 0; margin: 0; }
+        .vacancy-list li, .candidate-list li, .resume-list li { padding: 12px 0; border-bottom: 1px solid #eee; }
+        .vacancy-list li:last-child, .candidate-list li:last-child, .resume-list li:last-child { border-bottom: none; }
+        @media (max-width: 900px) {
+            .main-content { padding: 10px; }
+            .recruiting-section { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="profile">
+                <img src="https://placehold.co/50x50" width="50" height="50" alt="avatar">
+                <div style="margin-top:10px;">Александр</div>
+                <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+            </div>
+            <nav>
+                <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+                <a href="/employees" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+                <a href="/recruiting" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+                <a href="/tasks" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+                <a href="/company" class="{% if request.path == '/company' %}active{% endif %}">Компания</a>
+                <a href="#">Настройки</a>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div class="recruiting-section">
+                <h2>Активные вакансии</h2>
+                <ul class="vacancy-list">
+                    {% for v in vacancies %}
+                        <li>
+                            <a href="{{ url_for('vacancy_detail', vacancy_id=v[0]) }}" style="font-weight:bold; color:#612CCA; text-decoration:underline;">
+                                {{ v[1] }}
+                            </a><br>
+                            {{ v[2] }} &mdash; {{ v[3] }}
+                        </li>
+                    {% else %}
+                        <li style="color:#aaa;">Нет открытых вакансий</li>
+                    {% endfor %}
+                </ul>
+</div>
+<div class="recruiting-section">
+    <h2>Закрытые вакансии</h2>
+    <ul class="vacancy-list">
+        {% for v in closed_vacancies %}
+            <li>
+                <a href="{{ url_for('vacancy_detail', vacancy_id=v[0]) }}" style="font-weight:bold; color:#888; text-decoration:underline;">
+                    {{ v[1] }}
+                </a><br>
+                {{ v[2] }} &mdash; {{ v[3] }}
+            </li>
+        {% else %}
+            <li style="color:#aaa;">Нет закрытых вакансий</li>
+        {% endfor %}
+    </ul>
+            </div>
+            <div class="recruiting-section">
+                <h2>Кандидаты</h2>
+                <ul class="candidate-list">
+                    {% for c in candidates %}
+                        <li>
+                            <strong>{{ c[1] }}</strong> — {{ c[2] }}<br>
+                            Вакансия: {{ c[3] }}
+                        </li>
+                    {% else %}
+                        <li style="color:#aaa;">Нет кандидатов</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="recruiting-section">
+                <h2>База резюме</h2>
+                <ul class="resume-list">
+                    {% for r in resumes %}
+                        <li>
+                            {{ r[0] }} — <a href="{{ r[1] }}" target="_blank">Скачать резюме</a>
+                        </li>
+                    {% else %}
+                        <li style="color:#aaa;">Нет резюме</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

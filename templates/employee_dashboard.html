@@ -1,0 +1,85 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\employee_dashboard.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <style>
+        body { background: #f3f3f3; font-family: sans-serif; }
+        .main { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #eee; padding: 40px; }
+        .profile-info { display: flex; align-items: center; gap: 30px; margin-bottom: 30px; }
+        .profile-info img { border-radius: 50%; width: 80px; height: 80px; border: 2px solid #d6c7f3; }
+        .profile-details b { display: inline-block; width: 110px; color: #223355; }
+        .profile-details div { margin-bottom: 10px; }
+        .requests-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .requests-table th, .requests-table td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        .requests-table th { background: #f5f5f5; }
+        form { margin-top: 30px; }
+        input, select, textarea { margin-bottom: 10px; width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        button { background: #612CCA; color: #fff; padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div style="text-align:right; margin-bottom: 20px;">
+            <a href="{{ url_for('logout') }}" style="color:#612CCA; text-decoration:none; font-weight:bold;">Выйти</a>
+        </div>
+        <h2>Личный кабинет</h2>
+        <div class="profile-info">
+            <img src="{{ person[9] or '/static/avatars/default.jpg' }}" alt="avatar">
+            <div class="profile-details">
+                <div><b>ФИО:</b> {{ person[1] }}</div>
+                <div><b>Должность:</b> {{ person[3] }}</div>
+                <div><b>Отдел:</b> {{ person[2] }}</div>
+                <div><b>Дата приёма:</b> {{ person[4] }}</div>
+                <div><b>Отработанные часы:</b> {{ person[5] }}</div>
+                <div><b>Email:</b> {{ person[7] }}</div>
+                <div><b>Телефон:</b> {{ person[6] }}</div>
+                <div><b>Статус:</b> {{ person[8] }}</div>
+            </div>
+        </div>
+        <h3>Мои заявки</h3>
+        <table class="requests-table">
+            <tr>
+                <th>Тип</th>
+                <th>Дата начала</th>
+                <th>Дата окончания</th>
+                <th>Статус</th>
+                <th>Комментарий</th>
+            </tr>
+            {% for req in requests %}
+            <tr>
+                <td>{{ req[2] }}</td>
+                <td>{{ req[3] }}</td>
+                <td>{{ req[4] }}</td>
+                <td>{{ req[6] }}</td>
+                <td>{{ req[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>Создать новую заявку</h3>
+        <form method="post">
+            <select name="type" required>
+                <option value="">Тип заявки</option>
+                <option value="отпуск">Отпуск</option>
+                <option value="больничный">Больничный</option>
+                <option value="командировка">Командировка</option>
+                <option value="справка">Справка</option>
+            </select>
+            <input type="date" name="start_date" required>
+            <input type="date" name="end_date" required>
+            <textarea name="comment" placeholder="Комментарий"></textarea>
+            <button type="submit">Отправить заявку</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div style="margin-top:10px;">
+              {% for category, message in messages %}
+                <div class="{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>

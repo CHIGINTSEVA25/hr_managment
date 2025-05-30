@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Связь с отделом кадров</title>
+   <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content {
+            flex: 1;
+            padding: 0;
+        }
+        .container { max-width: 1100px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #eee; padding: 30px; }
+        h2, h3 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #f6f6f6; }
+        .msg-form { margin-top: 30px; }
+        .msg-form textarea { width: 100%; min-height: 60px; }
+        .msg-form select, .msg-form button { margin-top: 10px; }
+        .msg-form input[type="file"] { margin-top: 10px; }
+        .messages { margin-top: 40px; }
+        .faq { margin-top: 40px; background: #f9f9f9; border-radius: 8px; padding: 20px; }
+        .faq ul { margin: 0; padding-left: 20px; }
+        .training { margin-top: 40px; background: #f6f6ff; border-radius: 8px; padding: 20px; }
+        .events { margin-top: 40px; background: #f6fff6; border-radius: 8px; padding: 20px; }
+        .unread { font-weight: bold; color: #d00; }
+        .read { color: #888; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="profile" onclick="window.location.href='/profile';">
+                <img src="{{ avatar_url or '/static/avatars/kuz.jpg' }}" width="50" height="50" alt="avatar">
+                <div style="margin-top:10px;">{{ current_user.username }}</div>
+                <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+            </div>
+            <nav>
+                <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+                <a href="/employees" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+                <a href="/recruiting" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+                <a href="/tasks" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+                <a href="/hr_staff_contact" class="{% if request.path == '/hr_staff_contact' %}active{% endif %}">Связь с отделом кадров</a>
+                <a href="{{ url_for('requests_list') }}" class="{% if request.path.startswith('/requests') %}active{% endif %}">Заявки</a>
+                <a href="/company" class="{% if request.path == '/company' %}active{% endif %}">Компания</a>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div class="container">
+                <h2>Сотрудники отдела кадров</h2>
+                <table>
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Email</th>
+                    </tr>
+                    {% for staff in hr_staff %}
+                    <tr>
+                        <td>{{ staff[1] }}</td>
+                        <td>{{ staff[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <form class="msg-form" method="post" enctype="multipart/form-data">
+                    <h3>Отправить сообщение сотруднику отдела кадров</h3>
+                    <select name="recipient_id" required>
+                        <option value="">Выберите сотрудника</option>
+                        {% for staff in hr_staff %}
+                        <option value="{{ staff[0] }}">{{ staff[1] }} ({{ staff[2] }})</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <textarea name="message" placeholder="Ваше сообщение..." required></textarea>
+                    <br>
+                    <input type="file" name="attachment">
+                    <br>
+                    <button type="submit">Отправить</button>
+                </form>
+
+                <form method="get" style="margin-top:30px;">
+                    <input type="text" name="q" placeholder="Поиск по сообщениям" value="{{ request.args.get('q', '') }}">
+                    <select name="sort">
+                        <option value="date_desc" {% if request.args.get('sort') == 'date_desc' %}selected{% endif %}>Сначала новые</option>
+                        <option value="date_asc" {% if request.args.get('sort') == 'date_asc' %}selected{% endif %}>Сначала старые</option>
+                        <option value="fio" {% if request.args.get('sort') == 'fio' %}selected{% endif %}>По ФИО</option>
+                    </select>
+                    <button type="submit">Применить</button>
+                </form>
+
+                <div class="messages">
+                    <h3>Ваши отправленные сообщения</h3>
+                    <table>
+                        <tr>
+                            <th>Кому</th>
+                            <th>Сообщение</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Файл</th>
+                        </tr>
+                        {% for msg in sent_messages %}
+                        <tr>
+                            <td>{{ msg[1] }}</td>
+                            <td>{{ msg[2] }}</td>
+                            <td>{{ msg[3] }}</td>
+                            <td>
+                                {% if not msg[4] %}
+                                    <span class="unread">Не прочитано</span>
+                                {% else %}
+                                    <span class="read">Прочитано</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if msg[5] %}
+                                    <a href="{{ url_for('static', filename='uploads/' ~ msg[5]) }}" download>Скачать</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="messages">
+                    <h3>Входящие сообщения от HR</h3>
+                    <table>
+                        <tr>
+                            <th>От кого</th>
+                            <th>Сообщение</th>
+                            <th>Дата</th>
+                            <th>Файл</th>
+                            <th>Ответить</th>
+                        </tr>
+                        {% for msg in inbox_messages %}
+                        <tr>
+                            <td>{{ msg[1] }}</td>
+                            <td>{{ msg[2] }}</td>
+                            <td>{{ msg[3] }}</td>
+                            <td>
+                                {% if msg[5] %}
+                                    <a href="{{ url_for('static', filename='uploads/' ~ msg[5]) }}" download>Скачать</a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="recipient_id" value="{{ msg[6] }}">
+                                    <textarea name="message" placeholder="Ответить..." required></textarea>
+                                    <button type="submit">Ответить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="messages">
+                    <h3>История всех обращений</h3>
+                    <table>
+                        <tr>
+                            <th>Кому/От кого</th>
+                            <th>Сообщение</th>
+                            <th>Дата</th>
+                            <th>Статус</th>
+                            <th>Файл</th>
+                        </tr>
+                        {% for msg in all_messages %}
+                        <tr>
+                            <td>{{ msg[1] }}</td>
+                            <td>{{ msg[2] }}</td>
+                            <td>{{ msg[3] }}</td>
+                            <td>
+                                {% if not msg[4] %}
+                                    <span class="unread">Не прочитано</span>
+                                {% else %}
+                                    <span class="read">Прочитано</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if msg[5] %}
+                                    <a href="{{ url_for('static', filename='uploads/' ~ msg[5]) }}" download>Скачать</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="faq">
+                    <h3>Часто задаваемые вопросы и документы</h3>
+                    <ul>
+                        {% for title, link in faq_links %}
+                        <li><a href="{{ link }}" target="_blank">{{ title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="training">
+                    <h3>Планы обучения и развития персонала</h3>
+                    <table>
+                        <tr>
+                            <th>Название</th>
+                            <th>Описание</th>
+                            <th>Дата начала</th>
+                            <th>Дата окончания</th>
+                        </tr>
+                        {% for plan in training_plans %}
+                        <tr>
+                            <td>{{ plan[0] }}</td>
+                            <td>{{ plan[1] }}</td>
+                            <td>{{ plan[2] }}</td>
+                            <td>{{ plan[3] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div class="events">
+                    <h3>Журнал задач и событий отдела кадров</h3>
+                    <table>
+                        <tr>
+                            <th>Событие</th>
+                            <th>Описание</th>
+                            <th>Дата</th>
+                        </tr>
+                        {% for event in hr_events %}
+                        <tr>
+                            <td>{{ event[0] }}</td>
+                            <td>{{ event[1] }}</td>
+                            <td>{{ event[2] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

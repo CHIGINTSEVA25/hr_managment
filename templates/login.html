@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход | HRCloud</title>
+    <style>
+        body { background: #F3F3F3; font-family: sans-serif; }
+        .login-form { background: #fff; max-width: 400px; margin: 80px auto; padding: 30px; border-radius: 16px; box-shadow: 0 2px 16px #ccc; }
+        .login-form input, .login-form button { display: block; width: 100%; margin-bottom: 16px; padding: 12px; font-size: 16px; box-sizing: border-box; }
+        .login-form label { margin-bottom: 5px; display: block; font-size: 16px; }
+        .login-form .error { color: #a10000; margin-bottom: 10px; }
+        .login-form button { background: #612CCA; color: #fff; border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .login-form button:hover { background: #4a1fa6; }
+    </style>
+</head>
+<body>
+    <form class="login-form" method="post">
+        <h2>Вход</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="error">{{ messages[0][1] }}</div>
+          {% endif %}
+        {% endwith %}
+        <label>Логин
+            <input type="text" name="username" required>
+        </label>
+        <label>Пароль
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Войти</button>
+    </form>
+</body>
+</html>

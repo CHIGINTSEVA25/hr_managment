@@ -1,0 +1,35 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\vacancy_detail.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ vacancy[1] }} | Вакансия</title>
+    <style>
+        body { font-family: sans-serif; background: #F3F3F3; margin: 0; }
+        .vacancy-card { background: #fff; max-width: 700px; margin: 40px auto; border-radius: 10px; box-shadow: 0 2px 8px #eee; padding: 32px; }
+        .vacancy-title { font-size: 2em; margin-bottom: 10px; }
+        .vacancy-info { margin-bottom: 20px; }
+        .vacancy-info label { color: #888; font-weight: bold; width: 140px; display: inline-block; }
+        .vacancy-status { color: #612CCA; font-weight: bold; }
+        .vacancy-desc { font-size: 1.1em; background: #f8f8ff; border-radius: 6px; padding: 16px; white-space: pre-line; }
+        a { color: #612CCA; }
+    </style>
+</head>
+<body>
+    <div class="vacancy-card">
+        <div class="vacancy-title">{{ vacancy[1] }}</div>
+        <div class="vacancy-info">
+            <div><label>Отдел:</label> {{ vacancy[4] }}</div>
+            <div><label>Статус:</label> <span class="vacancy-status">{{ vacancy[3] }}</span></div>
+        </div>
+        <div>
+            <label style="color:#888;font-weight:bold;">Описание:</label>
+            <div class="vacancy-desc">{{ vacancy[2]|replace('\n', '<br>')|safe }}</div>
+        </div>
+        <br>
+        <a href="{{ url_for('edit_vacancy', vacancy_id=vacancy[0]) }}">Редактировать вакансию</a>
+        <br>
+        <a href="{{ url_for('recruiting') }}">← К списку вакансий</a>
+    </div>
+</body>
+</html>

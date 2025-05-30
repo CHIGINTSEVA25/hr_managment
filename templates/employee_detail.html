@@ -1,0 +1,57 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\employee_detail.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация о сотруднике</title>
+    <style>
+        body { font-family: sans-serif; background: #F3F3F3; }
+        .card {
+            background: #fff;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 2px 16px #ccc;
+        }
+        .card h2 { margin-top: 0; }
+        .card .info { margin-bottom: 20px; }
+        .card label { font-weight: bold; }
+        .actions { display: flex; gap: 20px; }
+        .actions form, .actions a { display: inline-block; }
+        .actions button, .actions a {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .actions .edit-btn { background: #612CCA; color: #fff; }
+        .actions .delete-btn { background: #e74c3c; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>{{ employee[1] }}</h2>
+        <div class="info">
+            <div><label>Отдел:</label> {{ employee[2] }}</div>
+            <div><label>Должность:</label> {{ employee[3] }}</div>
+            <div><label>Дата приёма:</label> {{ employee[4] }}</div>
+            <div><label>Отработанные часы:</label> {{ employee[5] }}</div>
+            <div><label>Контактный номер:</label> {{ employee[6] }}</div>
+            <div><label>Электронная почта:</label> {{ employee[7] }}</div>
+            <div><label>Статус:</label> {{ employee[8] }}</div>
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('edit_employee', id=employee[0]) }}" class="edit-btn">Изменить</a>
+            <form method="post" action="{{ url_for('delete_employee', id=employee[0]) }}" onsubmit="return confirm('Вы действительно хотите удалить этого сотрудника?');">
+                <button type="submit" class="delete-btn">Удалить</button>
+            </form>
+        </div>
+        <div style="margin-top:20px;">
+            <a href="{{ url_for('employees') }}">← Назад к списку</a>
+        </div>
+    </div>
+</body>
+</html>

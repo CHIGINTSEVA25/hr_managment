@@ -1,0 +1,72 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\edit_employee.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать сотрудника | HRCloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #F3F3F3; font-family: sans-serif; }
+        .edit-form { background: #fff; max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 16px; box-shadow: 0 2px 16px #ccc; }
+        .edit-form input, .edit-form select, .edit-form button { display: block; width: 100%; margin-bottom: 15px; padding: 8px; }
+        .edit-form label { margin-bottom: 5px; display: block; }
+        .edit-form a { display: inline-block; margin-top: 10px; color: #612CCA; text-decoration: none; }
+        .toast {
+            position: fixed; right: 30px; bottom: 30px; min-width: 220px; max-width: 350px; z-index: 9999;
+            background: #e6ffe6; color: #207520; border: 1px solid #b2e6b2; padding: 16px 24px; border-radius: 10px;
+            font-size: 18px; box-shadow: 0 2px 16px #ccc; opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .toast.show { opacity: 1; pointer-events: auto; }
+        .toast.flash-error { background: #ffe6e6; color: #a10000; border: 1px solid #e6b2b2; }
+    </style>
+</head>
+<body>
+    <form class="edit-form" method="post">
+        <h2>Редактировать сотрудника</h2>
+        <label>ФИО
+            <input type="text" name="фио" value="{{ employee[1] }}" required>
+        </label>
+        <label>Отдел
+            <select name="отдел_id" required>
+                {% for dep in departments %}
+                    <option value="{{ dep[0] }}" {% if dep[0] == employee[2] %}selected{% endif %}>{{ dep[1] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Должность
+            <input type="text" name="должность" value="{{ employee[3] }}" required>
+        </label>
+        <label>Дата приёма
+            <input type="date" name="дата_приема" value="{{ employee[4] }}" required>
+        </label>
+        <label>Отработанные часы
+            <input type="number" name="отработанные_часы" value="{{ employee[5] }}" required>
+        </label>
+        <label>Контактный номер
+            <input type="text" name="контактный_номер" value="{{ employee[6] }}" required>
+        </label>
+        <label>Электронная почта
+            <input type="email" name="электронная_почта" value="{{ employee[7] }}" required>
+        </label>
+        <label>Статус
+            <input type="text" name="статус" value="{{ employee[8] }}" required>
+        </label>
+        <button type="submit">Сохранить</button>
+        <a href="{{ url_for('employees') }}">Назад</a>
+    </form>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="toast" class="toast{% if messages[0][0] == 'error' %} flash-error{% endif %}">{{ messages[0][1] }}</div>
+    <script>
+      window.onload = function() {
+        var toast = document.getElementById('toast');
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(function(){ toast.classList.remove('show'); }, 4000);
+        }
+      }
+    </script>
+  {% endif %}
+{% endwith %}
+</body>
+</html>

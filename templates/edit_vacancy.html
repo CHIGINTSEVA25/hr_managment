@@ -1,0 +1,45 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\edit_vacancy.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать вакансию</title>
+    <style>
+        body { font-family: sans-serif; background: #F3F3F3; }
+        .form-card { background: #fff; max-width: 600px; margin: 40px auto; border-radius: 10px; box-shadow: 0 2px 8px #eee; padding: 32px; }
+        label { display: block; margin-top: 16px; }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
+        button { margin-top: 20px; padding: 10px 24px; background: #612CCA; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h2>Редактировать вакансию</h2>
+        <form method="post">
+            <label>Название</label>
+            <input type="text" name="title" value="{{ vacancy[1] }}" required>
+
+            <label>Отдел</label>
+            <select name="department_id" required>
+                {% for dep in departments %}
+                    <option value="{{ dep[0] }}" {% if dep[0] == vacancy[4] %}selected{% endif %}>{{ dep[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Статус</label>
+            <select name="status" required>
+                <option value="открыта" {% if vacancy[3] == 'открыта' %}selected{% endif %}>открыта</option>
+                <option value="закрыта" {% if vacancy[3] == 'закрыта' %}selected{% endif %}>закрыта</option>
+                <option value="заморожена" {% if vacancy[3] == 'заморожена' %}selected{% endif %}>заморожена</option>
+            </select>
+
+            <label>Описание</label>
+            <textarea name="description" rows="10" required>{{ vacancy[2] }}</textarea>
+
+            <button type="submit">Сохранить</button>
+        </form>
+        <br>
+        <a href="{{ url_for('vacancy_detail', vacancy_id=vacancy[0]) }}">← Назад к вакансии</a>
+    </div>
+</body>
+</html>

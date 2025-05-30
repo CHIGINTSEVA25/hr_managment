@@ -1,0 +1,134 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\company.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Компания | HRCloud</title>
+    <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content { flex: 1; max-width: 900px; margin: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px #eee; padding: 40px; }
+        .logo { display: block; margin: 0 auto 30px auto; max-width: 180px; }
+        h1 { text-align: center; margin-bottom: 10px; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .info-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+        .info-table td:first-child { color: #888; font-weight: bold; width: 220px; }
+        .dates-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .dates-table th, .dates-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+        .dates-table th { background: #f8f8ff; color: #612CCA; }
+        .docs-list { list-style: none; padding: 0; }
+        .docs-list li { margin-bottom: 10px; }
+        .section-title { color: #612CCA; margin-top: 30px; }
+        @media (max-width: 700px) {
+            .main-content { padding: 10px; }
+            .info-table td:first-child { width: 120px; }
+            .sidebar { width: 100px; padding: 10px 0; }
+            .sidebar nav a { font-size: 14px; padding: 4px 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="profile">
+                <img src="https://placehold.co/50x50" width="50" height="50" alt="avatar">
+                <div style="margin-top:10px;">Александр</div>
+                <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+            </div>
+            <nav>
+                <a href="/" class="{% if request.path == '/' %}active{% endif %}">Главная</a>
+                <a href="/employees" class="{% if request.path == '/employees' %}active{% endif %}">Сотрудники</a>
+                <a href="/recruiting" class="{% if request.path == '/recruiting' %}active{% endif %}">Рекрутинг</a>
+                <a href="/tasks" class="{% if request.path == '/tasks' %}active{% endif %}">Задачи</a>
+                <a href="/company" class="{% if request.path == '/company' %}active{% endif %}">Компания</a>
+                <a href="#">Настройки</a>
+            </nav>
+        </div>
+        <div class="main-content">
+             <img src="/static/company_logo.png" alt="Логотип компании" class="logo">
+            <h1>ABC</h1>
+            {% if company_info %}
+            <table class="info-table">
+                <tr><td>Юридический адрес</td><td>{{ company_info[0] }}</td></tr>
+                <tr><td>Фактический адрес</td><td>{{ company_info[1] }}</td></tr>
+                <tr><td>ИНН</td><td>{{ company_info[2] }}</td></tr>
+                <tr><td>ОГРН</td><td>{{ company_info[3] }}</td></tr>
+                <tr><td>Руководитель</td><td>{{ company_info[4] }}</td></tr>
+                <tr><td>Контактный номер</td><td>{{ company_info[5] }}</td></tr>
+                <tr><td>Электронная почта</td><td>{{ company_info[6] }}</td></tr>
+                <tr><td>Сайт</td><td><a href="{{ company_info[7] }}" target="_blank">{{ company_info[7] }}</a></td></tr>
+            </table>
+            {% else %}
+                <div style="color:#aaa;">Нет информации о компании</div>
+            {% endif %}
+
+            <h2 class="section-title">Важные даты</h2>
+            <table class="dates-table">
+                <tr>
+                    <th>Тип</th>
+                    <th>Описание</th>
+                    <th>Дата</th>
+                    <th>Сотрудник</th>
+                </tr>
+                {% for d in important_dates %}
+                <tr>
+                    <td>{{ d[0] }}</td>
+                    <td>{{ d[1] }}</td>
+                    <td>{{ d[2] }}</td>
+                    <td>{{ d[3] or '' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="color:#aaa;">Нет важных дат</td></tr>
+                {% endfor %}
+            </table>
+
+            <h2 class="section-title">Политики и документы</h2>
+            <ul class="docs-list">
+                {% for doc in docs %}
+                    <li>
+                        <a href="{{ doc[1] }}" target="_blank">{{ doc[0] }}</a>
+                    </li>
+                {% else %}
+                    <li style="color:#aaa;">Нет документов</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

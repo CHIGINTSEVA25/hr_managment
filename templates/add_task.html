@@ -1,0 +1,125 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\add_task.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить задачу | HRCloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #F3F3F3; font-family: sans-serif; margin: 0; }
+        .layout { display: flex; min-height: 100vh; background: white; }
+        .sidebar {
+            width: 220px;
+            background: #fff;
+            border-right: 1px solid #E8E8E8;
+            min-height: 100vh;
+            padding: 30px 0;
+            box-shadow: 0px 20px 50px rgba(219,224,248,0.5);
+        }
+        .sidebar .profile {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .sidebar .profile img {
+            border-radius: 50%;
+        }
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-left: 30px;
+        }
+        .sidebar nav a {
+            color: #000;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 6px 0;
+        }
+        .sidebar nav a.active {
+            color: #612CCA;
+            font-weight: bold;
+        }<style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .add-form { background: #fff; max-width: 500px; margin: 40px auto; padding: 30px; border-radius: 16px; box-shadow: 0 2px 16px #ccc; }
+        .add-form input, .add-form textarea, .add-form button { display: block; width: 100%; margin-bottom: 15px; padding: 8px; }
+        .add-form label { margin-bottom: 5px; display: block; }
+        .add-form a { display: inline-block; margin-top: 10px; color: #612CCA; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://placehold.co/50x50" width="50" height="50" alt="avatar">
+            <div style="margin-top:10px;">Александр</div>
+            <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+        </div>
+        <nav>
+            <a href="/">Главная</a>
+            <a href="/employees">Сотрудники</a>
+            <a href="#">Открытые вакансии</a>
+            <a href="/tasks">Задачи</a>
+            <a href="#">Компания</a>
+            <a href="#">Настройки</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <form class="add-form" method="post">
+            <h2>Добавить задачу сотруднику</h2>
+            <label>Название задачи
+                <input type="text" name="title" required>
+            </label>
+            <label>Описание
+                <textarea name="description" rows="3"></textarea>
+            </label>
+            <label>Выполнить до
+                <input type="date" name="due_date" required>
+            </label>
+            <button type="submit">Добавить</button>
+            <a href="{{ url_for('employee_tasks', employee_id=employee_id) }}">Назад к задачам</a>
+        </form>
+    </div>
+</div>
+</body>
+</html>

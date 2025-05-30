@@ -1,0 +1,275 @@
+<!-- filepath: c:\Users\dasch\OneDrive\Desktop\Team\templates\requests_list.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заявки сотрудников</title>
+   <style>
+    body { font-family: sans-serif; background: #F3F3F3; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+        width: 250px;
+        background: #fff; /* основной цвет */
+        color: #000;      /* основной цвет текста */
+        padding: 30px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .sidebar .profile {
+        text-align: center;
+        margin-bottom: 30px;
+        cursor: pointer;
+    }
+    .sidebar .profile img {
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+    .sidebar nav {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .sidebar nav a {
+        color: #000; /* черный текст */
+        text-decoration: none;
+        padding: 12px 30px;
+        display: block;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+        background: #d5b5e6; /* цвет при наведении */
+        color: #fff;          /* белый текст при наведении */
+    }
+        .logout-link {
+            display: block;
+            margin: 30px 0 0 30px;
+            color: #612CCA;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .main { flex: 1; padding: 40px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #eee; padding: 8px; text-align: center; }
+        th { background: #f5f5f5; cursor:pointer; }
+        form { display: inline; }
+        .btn { padding: 6px 16px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-approve { background: #4CAF50; color: #fff; }
+        .btn-reject { background: #F44336; color: #fff; }
+        .search-block { margin-bottom: 20px; display: flex; gap: 16px; align-items: center; position: relative; }
+        .search-block input, .search-block select { padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; }
+        .search-block button { padding: 6px 18px; border-radius: 4px; background: #612CCA; color: #fff; border: none; }
+        .pagination { margin-top: 20px; text-align: center; }
+        .pagination a, .pagination span { margin: 0 4px; font-size: 16px; }
+        .pagination span { font-weight: bold; color: #612CCA; }
+        .export-link { margin-bottom: 20px; display: inline-block; }
+        #suggestions {
+            position: absolute;
+            top: 38px;
+            left: 0;
+            background: #fff;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 220px;
+        }
+        #suggestions div {
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+        #suggestions div:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <div class="sidebar">
+        <div class="profile" onclick="window.location.href='/profile';" style="cursor:pointer;">
+            <img src="{{ avatar_url or '/static/avatars/kuz.jpg' }}" width="50" height="50" alt="avatar">
+            <div style="margin-top:10px;">{{ current_user.username }}</div>
+            <div style="color: #A4A4A4; font-size: 13px;">HR Manager</div>
+        </div>
+        <nav>
+            <a href="{{ url_for('index') }}">Главная</a>
+            <a href="{{ url_for('employees') }}">Сотрудники</a>
+            <a href="{{ url_for('recruiting') }}">Рекрутинг</a>
+            <a href="{{ url_for('all_tasks') }}">Задачи</a>
+            <a href="{{ url_for('requests_list') }}" class="active">Заявки</a>
+            <a href="{{ url_for('company') }}">Компания</a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
+    </div>
+    <div class="main">
+        <h2>Заявки сотрудников</h2>
+        <a href="{{ url_for('export_requests') }}" class="btn export-link">Экспорт в Excel</a>
+        <form class="search-block" method="get" autocomplete="off">
+            <div style="position:relative;">
+                <input type="text" id="search-input" name="search" placeholder="Поиск по ФИО" value="{{ search }}" autocomplete="off">
+                <div id="suggestions"></div>
+            </div>
+            <select name="status">
+                <option value="">Все статусы</option>
+                <option value="новая" {% if status=='новая' %}selected{% endif %}>Новая</option>
+                <option value="одобрена" {% if status=='одобрена' %}selected{% endif %}>Одобрена</option>
+                <option value="отклонена" {% if status=='отклонена' %}selected{% endif %}>Отклонена</option>
+            </select>
+            <select name="type">
+                <option value="">Все типы</option>
+                <option value="отпуск" {% if type=='отпуск' %}selected{% endif %}>Отпуск</option>
+                <option value="больничный" {% if type=='больничный' %}selected{% endif %}>Больничный</option>
+                <option value="командировка" {% if type=='командировка' %}selected{% endif %}>Командировка</option>
+                <option value="справка" {% if type=='справка' %}selected{% endif %}>Справка</option>
+            </select>
+            <select name="department">
+                <option value="">Все отделы</option>
+                {% for dep in departments %}
+                    <option value="{{ dep[0] }}" {% if department==dep[0]|string %}selected{% endif %}>{{ dep[1] }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort">
+                <option value="created_at" {% if sort=='created_at' %}selected{% endif %}>По дате создания</option>
+                <option value="start_date" {% if sort=='start_date' %}selected{% endif %}>По дате начала</option>
+                <option value="end_date" {% if sort=='end_date' %}selected{% endif %}>По дате окончания</option>
+                <option value="status" {% if sort=='status' %}selected{% endif %}>По статусу</option>
+            </select>
+            <select name="order">
+                <option value="desc" {% if order=='desc' %}selected{% endif %}>По убыванию</option>
+                <option value="asc" {% if order=='asc' %}selected{% endif %}>По возрастанию</option>
+            </select>
+            <button type="submit">Применить</button>
+        </form>
+        <form id="bulk-action-form" method="post" action="{{ url_for('bulk_requests_action') }}">
+        <table>
+            <tr>
+                <th><input type="checkbox" onclick="toggleAll(this)"></th>
+                <th>Сотрудник</th>
+                <th>Отдел</th>
+                <th>Тип</th>
+                <th>Дата начала</th>
+                <th>Дата окончания</th>
+                <th>Статус</th>
+                <th>Комментарий</th>
+                <th>Создана</th>
+                <th>Действия</th>
+            </tr>
+            {% for req in requests %}
+            <tr>
+                <td>
+                    {% if req[5] == 'новая' %}
+                    <input type="checkbox" name="selected_requests" value="{{ req[0] }}">
+                    {% endif %}
+                </td>
+                <td>{{ req[1] }}</td>
+                <td>{{ req[8] }}</td>
+                <td>{{ req[2] }}</td>
+                <td>{{ req[3] }}</td>
+                <td>{{ req[4] }}</td>
+                <td>{{ req[5] }}</td>
+                <td>{{ req[6] }}</td>
+                <td>{{ req[7].strftime('%d.%m.%Y %H:%M') if req[7] else '' }}</td>
+                <td>
+                    <button type="button" onclick="showDetails({{ req[0] }})">Подробнее</button>
+                    {% if req[5] == 'новая' %}
+                    <form method="post" action="{{ url_for('request_action', request_id=req[0], action='approve') }}" style="display:inline;">
+                        <button class="btn btn-approve" type="submit">Одобрить</button>
+                    </form>
+                    <form method="post" action="{{ url_for('request_action', request_id=req[0], action='reject') }}" style="display:inline;">
+                        <button class="btn btn-reject" type="submit">Отклонить</button>
+                    </form>
+                    {% else %}
+                        <span>-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div style="margin: 10px 0;">
+            <button class="btn btn-approve" type="submit" name="bulk_action" value="approve">Одобрить выбранные</button>
+            <button class="btn btn-reject" type="submit" name="bulk_action" value="reject">Отклонить выбранные</button>
+        </div>
+        </form>
+        <div class="pagination">
+            {% for p in range(1, pages+1) %}
+                {% if p == page %}
+                    <span>{{ p }}</span>
+                {% else %}
+                    <a href="{{ request.full_path.replace('page=' ~ page, 'page=' ~ p) if 'page=' in request.full_path else request.full_path ~ '&page=' ~ p }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div style="margin-top:10px;">
+              {% for category, message in messages %}
+                <div class="{{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+</div>
+<!-- Модальное окно для подробностей заявки -->
+<div id="modal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); align-items:center; justify-content:center;">
+    <div id="modal-content" style="background:#fff; padding:30px; border-radius:10px; min-width:300px; max-width:500px; position:relative;">
+        <span style="position:absolute; right:10px; top:10px; cursor:pointer;" onclick="closeModal()">✖</span>
+        <div id="modal-body">Загрузка...</div>
+    </div>
+</div>
+<script>
+const input = document.getElementById('search-input');
+const suggestions = document.getElementById('suggestions');
+
+input.addEventListener('input', function() {
+    const query = this.value;
+    if (query.length < 2) {
+        suggestions.style.display = 'none';
+        return;
+    }
+    fetch('/requests/search_suggestions?query=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(data => {
+            if (data.length === 0) {
+                suggestions.style.display = 'none';
+                return;
+            }
+            suggestions.innerHTML = data.map(item => `<div onclick="selectSuggestion('${item.replace(/'/g, "\\'")}')">${item}</div>`).join('');
+            suggestions.style.display = 'block';
+            suggestions.style.width = input.offsetWidth + 'px';
+        });
+});
+
+function selectSuggestion(value) {
+    input.value = value;
+    suggestions.style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+    if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.style.display = 'none';
+    }
+});
+
+function showDetails(id) {
+    fetch('/requests/details/' + id)
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal').style.display = 'flex';
+        });
+}
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
+function toggleAll(source) {
+    checkboxes = document.getElementsByName('selected_requests');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+</script>
+</body>
+</html>
